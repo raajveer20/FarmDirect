@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FarmDirect Marketplace</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7fbf4;
+            color: #1f3b1f;
+        }
+
+        nav {
+            background: #256d3a;
+            color: white;
+            padding: 18px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 18px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #5d6d59;
+        }
+
+        .products {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            padding: 35px 8%;
+        }
+
+        .product-card {
+            width: 245px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 3px 10px #c9d8c4;
+        }
+
+        .product-image {
+            font-size: 65px;
+            text-align: center;
+            background: #eaf6e5;
+            border-radius: 8px;
+            padding: 18px;
+        }
+
+        .price {
+            color: #256d3a;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .farmer {
+            color: #677363;
+        }
+
+        .buy-button {
+            display: block;
+            text-align: center;
+            background: #f5a623;
+            color: #1f3b1f;
+            padding: 11px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h2>🌾 FarmDirect</h2>
+        <div>
+            <a href="/">Home</a>
+            <a href="/products">Marketplace</a>
+            <a href="/farmer">Farmer Portal</a>
+            <a href="/orders">My Orders</a>
+            <a href="/admin">Admin</a>
+        </div>
+    </nav>
+
+    <h1>Fresh Produce Marketplace</h1>
+    <p class="subtitle">Buy fresh, locally sourced produce directly from farmers.</p>
+
+    <section class="products">
+        {% for product in products %}
+        <div class="product-card">
+            <div class="product-image">{{ product.emoji }}</div>
+            <h2>{{ product.name }}</h2>
+            <p class="price">₹{{ product.price }} / kg</p>
+            <p>Available: {{ product.quantity }} kg</p>
+            <p class="farmer">Farmer: {{ product.farmer }}, {{ product.location }}</p>
+            <a class="buy-button" href="{{ url_for('orders', product=product.name, price=product.price) }}">Buy Now</a>
+        </div>
+        {% endfor %}
+    </section>
+
+</body>
+</html>

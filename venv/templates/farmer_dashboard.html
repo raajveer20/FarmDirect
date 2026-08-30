@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Farmer Portal | FarmDirect</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7fbf4;
+            color: #1f3b1f;
+        }
+
+        nav {
+            background: #256d3a;
+            color: white;
+            padding: 18px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 18px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .form-card, .listing-card {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px #c9d8c4;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin: 14px 0 6px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px;
+            box-sizing: border-box;
+            border: 1px solid #b8cbb3;
+            border-radius: 6px;
+        }
+
+        button {
+            margin-top: 20px;
+            background: #256d3a;
+            color: white;
+            border: none;
+            padding: 13px 22px;
+            border-radius: 7px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .status {
+            color: #256d3a;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h2>🌾 FarmDirect</h2>
+        <div>
+            <a href="/">Home</a>
+            <a href="/products">Marketplace</a>
+            <a href="/farmer">Farmer Portal</a>
+            <a href="/orders">My Orders</a>
+            <a href="/admin">Admin</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Farmer Portal</h1>
+        <p>Welcome, Ramesh Patil. Add your fresh produce for direct sale.</p>
+
+        <div class="form-card">
+            <h2>Add New Produce</h2>
+
+            <form method="POST">
+                <label>Crop Name</label>
+                <input type="text" name="crop_name" placeholder="Example: Tomatoes" required>
+
+                <label>Available Quantity (kg)</label>
+                <input type="number" name="quantity" placeholder="Example: 200" required>
+
+                <label>Price per kg (₹)</label>
+                <input type="number" name="price" placeholder="Example: 22" required>
+
+                <label>Farm Location</label>
+                <input type="text" name="location" placeholder="Example: Nashik, Maharashtra" required>
+
+                <label>Harvest Date</label>
+                <input type="date" required>
+
+                <button type="submit">List Produce</button>
+            </form>
+
+        </div>
+
+        <div class="listing-card">
+            <h2>My Active Listing</h2>
+            <h3>🍅 Fresh Tomatoes</h3>
+            <p><strong>Quantity:</strong> 200 kg</p>
+            <p><strong>Price:</strong> ₹22 / kg</p>
+            <p><strong>Location:</strong> Nashik, Maharashtra</p>
+            <p class="status">Status: Active in Marketplace</p>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Place Order | FarmDirect</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f7fbf4; color: #1f3b1f; }
+        nav { background: #256d3a; color: white; padding: 18px 8%; display: flex; justify-content: space-between; align-items: center; }
+        nav a { color: white; text-decoration: none; margin-left: 18px; }
+        .container { max-width: 720px; margin: 45px auto; padding: 0 20px; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 3px 10px #c9d8c4; }
+        label { display: block; margin: 16px 0 6px; font-weight: bold; }
+        input, textarea { width: 100%; box-sizing: border-box; padding: 11px; border: 1px solid #b8cbb3; border-radius: 6px; }
+        button { margin-top: 22px; padding: 13px 22px; border: 0; border-radius: 7px; background: #f5a623; color: #1f3b1f; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .summary { background: #eaf6e5; padding: 15px; border-radius: 8px; }
+        .success { background: #dff2d8; color: #256d3a; padding: 15px; border-radius: 8px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2>🌾 FarmDirect</h2>
+        <div>
+            <a href="/">Home</a>
+            <a href="/products">Marketplace</a>
+            <a href="/farmer">Farmer Portal</a>
+            <a href="/orders">My Orders</a>
+            <a href="/admin">Admin</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1>Place Your Order</h1>
+
+        {% if confirmation %}
+        <p class="success">{{ confirmation }}</p>
+        <p><a href="/products">← Return to Marketplace</a></p>
+        {% else %}
+        <div class="card">
+            <div class="summary">
+                <h2>{{ selected_product }}</h2>
+                <p><strong>Direct farmer price:</strong> ₹{{ selected_price }} / kg</p>
+            </div>
+
+            <form method="POST">
+                <input type="hidden" name="product" value="{{ selected_product }}">
+                <input type="hidden" name="price" value="{{ selected_price }}">
+
+                <label>Your Name</label>
+                <input type="text" name="buyer_name" placeholder="Example: Priya Sharma" required>
+
+                <label>Quantity (kg)</label>
+                <input type="number" name="quantity" min="1" value="1" required>
+
+                <label>Delivery Address</label>
+                <textarea name="address" rows="3" placeholder="Enter your delivery address" required></textarea>
+
+                <button type="submit">Confirm Order</button>
+            </form>
+        </div>
+        {% endif %}
+    </main>
+</body>
+</html>
