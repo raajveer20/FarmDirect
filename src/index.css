@@ -2,75 +2,213 @@
 
 @layer base {
   :root {
-    --primary: #16a34a;
-    --primary-hover: #15803d;
-    --primary-light: #dcfce7;
-    --accent-gold: #eab308;
-    --bg-main: #f8fafc;
+    --primary: #059669;
+    --primary-hover: #047857;
+    --primary-light: #ecfdf5;
+    --accent-emerald: #10b981;
+    --accent-amber: #f59e0b;
+    --accent-blue: #2563eb;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
   }
   
   body {
     background-color: #f8fafc;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.07) 0px, transparent 45%),
+      radial-gradient(at 100% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 40%),
+      radial-gradient(at 50% 60%, rgba(245, 158, 11, 0.03) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 40%);
+    background-attachment: fixed;
     color: #0f172a;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow-x: hidden;
+    letter-spacing: -0.012em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-/* Custom UI Polish & Animations */
+/* ========================================================================= */
+/* PREMIUM GLASSMORPHISM SYSTEM (TASTEFUL, LIGHTWEIGHT, HIGH-CONTRAST)       */
+/* ========================================================================= */
+
+/* 1. Glass Navigation Bar */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(20px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.75) !important;
+  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* 2. Primary Glass Cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 10px 30px -6px rgba(15, 23, 42, 0.05),
+    0 0 0 1px rgba(226, 232, 240, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 20px 40px -10px rgba(15, 23, 42, 0.09),
+    0 0 0 1px rgba(16, 185, 129, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* 3. Glass Modal Window */
+.glass-modal {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 25px 60px -15px rgba(15, 23, 42, 0.25),
+    0 0 0 1px rgba(226, 232, 240, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* 4. Glass Surface / Panels */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 12px 35px -8px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* 5. Glass Dark Card (For Hero / Stats / High-Impact Accents) */
+.glass-dark-card {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.92) 0%, rgba(6, 28, 20, 0.9) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 20px 45px -10px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* 6. Frosted Interactive Pills */
+.glass-pill {
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.glass-dark {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(51, 65, 85, 0.8);
+.glass-pill:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
 }
 
-.gradient-text {
-  background: linear-gradient(135deg, #15803d 0%, #059669 50%, #0284c7 100%);
+/* 7. Luminous Border Glows */
+.glow-emerald {
+  box-shadow: 0 0 25px -4px rgba(16, 185, 129, 0.2);
+}
+
+.glow-blue {
+  box-shadow: 0 0 25px -4px rgba(37, 99, 235, 0.2);
+}
+
+.glow-amber {
+  box-shadow: 0 0 25px -4px rgba(245, 158, 11, 0.2);
+}
+
+/* 8. Refined Gradient Text */
+.gradient-emerald {
+  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #0d9488 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.hero-gradient {
-  background: radial-gradient(circle at 50% 0%, rgba(22, 163, 74, 0.12) 0%, rgba(248, 250, 252, 0) 70%);
+.gradient-text-hero {
+  background: linear-gradient(135deg, #34d399 0%, #a7f3d0 45%, #fde68a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-@keyframes pulse-slow {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(1.02); }
+/* 9. Soft Subtle Transitions */
+button, a {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.animate-pulse-slow {
-  animation: pulse-slow 3s infinite ease-in-out;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-}
-
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-}
-
-/* Custom Scrollbar */
+/* Custom Sleek Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: rgba(203, 213, 225, 0.8);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: rgba(148, 163, 184, 0.9);
+}
+
+/* ========================================================================= */
+/* LEAFLET MAP STYLING & GLITCH FIXES                                        */
+/* ========================================================================= */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 10 !important;
+  font-family: inherit !important;
+  outline: none !important;
+}
+
+.leaflet-div-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+.leaflet-pane {
+  z-index: 10 !important;
+}
+
+.leaflet-top, .leaflet-bottom {
+  z-index: 20 !important;
+}
+
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.leaflet-control-zoom a {
+  background-color: #0f172a !important;
+  color: #10b981 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #1e293b !important;
+  color: #34d399 !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #ffffff !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  padding: 4px !important;
+}
+
+.leaflet-popup-tip {
+  background: #ffffff !important;
 }

@@ -14,7 +14,7 @@ export const TrackingTimeline = ({ order }) => {
   ];
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6">
+    <div className="glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.04)] space-y-6">
       
       {/* Order Header Summary */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">

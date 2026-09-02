@@ -99,10 +99,10 @@ export const DemoGuideModal = () => {
   const currentScenario = steps.find(s => s.step === demoStep) || steps[0];
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 max-w-md w-full bg-slate-900 text-white rounded-2xl p-5 shadow-2xl border border-emerald-500/40 backdrop-blur-xl animate-float">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+    <div className="fixed bottom-6 right-6 z-50 max-w-md w-full glass-modal text-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-white/20 animate-float">
+      <div className="flex items-center justify-between border-b border-white/10 pb-3">
         <div className="flex items-center gap-2">
-          <span className="w-7 h-7 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center font-extrabold text-xs">
+          <span className="w-7 h-7 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 flex items-center justify-center font-black text-xs shadow-xs">
             SIH
           </span>
           <span className="text-xs font-bold text-emerald-400">Interactive Demo Flow (Scenario 18)</span>

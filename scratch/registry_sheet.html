@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Government Verified Farmers Registry - FarmDirect SIH 2026</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 15mm;
+    }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      color: #0f172a;
+      background: #ffffff;
+      line-height: 1.4;
+      font-size: 11px;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      border-bottom: 2px solid #059669;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-title h1 {
+      font-size: 20px;
+      color: #065f46;
+      margin: 0 0 4px 0;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .header-title p {
+      margin: 0;
+      font-size: 11px;
+      color: #475569;
+      font-weight: 500;
+    }
+    .badge {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .notice-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #059669;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 11px;
+    }
+    .notice-box strong {
+      color: #065f46;
+    }
+    h2 {
+      font-size: 13px;
+      color: #1e293b;
+      margin: 14px 0 8px 0;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 10px;
+    }
+    th {
+      background: #065f46;
+      color: #ffffff;
+      text-align: left;
+      padding: 7px 9px;
+      font-weight: 600;
+      border: 1px solid #047857;
+    }
+    td {
+      padding: 7px 9px;
+      border: 1px solid #e2e8f0;
+      vertical-align: middle;
+    }
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    .code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-weight: 700;
+      color: #0f766e;
+      background: #f0fdfa;
+      padding: 2px 4px;
+      border-radius: 4px;
+      border: 1px solid #ccfbf1;
+    }
+    .code-danger {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-weight: 700;
+      color: #b91c1c;
+      background: #fef2f2;
+      padding: 2px 4px;
+      border-radius: 4px;
+      border: 1px solid #fecaca;
+    }
+    .status-pass {
+      color: #047857;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+    }
+    .status-fail {
+      color: #b91c1c;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+    }
+    .demo-steps {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 14px;
+    }
+    .demo-steps h3 {
+      margin: 0 0 6px 0;
+      color: #166534;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .demo-steps ol {
+      margin: 0;
+      padding-left: 18px;
+      color: #14532d;
+      font-size: 10.5px;
+    }
+    .demo-steps li {
+      margin-bottom: 4px;
+    }
+    .footer {
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 1px solid #cbd5e1;
+      font-size: 9.5px;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-title">
+      <h1>FarmDirect &bull; Government Verified Farmers Registry</h1>
+      <p>Official Pre-Verified Land Records & Anti-Middleman Verification Dataset | Smart India Hackathon 2026</p>
+    </div>
+    <div>
+      <span class="badge">PostgreSQL Active Registry</span>
+    </div>
+  </div>
+
+  <div class="notice-box">
+    <strong>SIH Evaluation Objective:</strong> In traditional mandis, commission agents and village brokers masquerade as farmers to trade produce and extract high cuts. FarmDirect integrates a state-level <strong>Bhulekh & PM-Kisan Land Registry Gatekeeper</strong>. Only authenticated landholders can list produce; fake entries are blocked with HTTP 403 Forbidden.
+  </div>
+
+  <h2>1. Authorized Government Verified Farmer Registry (Valid Credentials)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>State & District</th>
+        <th>Farmer Name</th>
+        <th>PM-Kisan ID</th>
+        <th>Aadhaar Number</th>
+        <th>Registered Phone</th>
+        <th>Land Record (Bhulekh Survey)</th>
+        <th>Land Parcel</th>
+        <th>KCC Number (Bank)</th>
+        <th>Certified Crops</th>
+        <th>Bank UPI ID</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Madhya Pradesh</strong><br>Sehore / Ashta</td>
+        <td><strong>Ramesh Patel</strong></td>
+        <td><span class="code">PMK-MP-2024-88392</span></td>
+        <td><span class="code">9823-4512-6701</span></td>
+        <td>9876543210</td>
+        <td>Khasra #214/1, Khatauni #88<br>(Kothri Village)</td>
+        <td><strong>4.50 Acres</strong></td>
+        <td><span class="code">KCC-SBIN-882190</span></td>
+        <td>Tomatoes, Onions, Wheat</td>
+        <td><span class="code">ramesh.patel@sbi</span></td>
+        <td><span class="status-pass">&check; PASS</span></td>
+      </tr>
+      <tr>
+        <td><strong>Maharashtra</strong><br>Nashik / Niphad</td>
+        <td><strong>Sunita Bai Deshmukh</strong></td>
+        <td><span class="code">PMK-MH-2024-77120</span></td>
+        <td><span class="code">4512-8890-3321</span></td>
+        <td>9823456789</td>
+        <td>Khasra #108/3, Khatauni #42<br>(Pimpalgaon Baswant)</td>
+        <td><strong>6.20 Acres</strong></td>
+        <td><span class="code">KCC-BOI-771209</span></td>
+        <td>Red Onions, Grapes, Pomegranate</td>
+        <td><span class="code">sunita.deshmukh@hdfcbank</span></td>
+        <td><span class="status-pass">&check; PASS</span></td>
+      </tr>
+      <tr>
+        <td><strong>Andhra Pradesh</strong><br>Guntur / Tenali</td>
+        <td><strong>Naveen Reddy</strong></td>
+        <td><span class="code">PMK-AP-2024-11044</span></td>
+        <td><span class="code">7712-4433-9012</span></td>
+        <td>9100977665</td>
+        <td>Khasra #331/2, Khatauni #19<br>(Chilakaluripet)</td>
+        <td><strong>3.80 Acres</strong></td>
+        <td><span class="code">KCC-ANDHRA-9901</span></td>
+        <td>Green Chillies, Turmeric, Cotton</td>
+        <td><span class="code">naveen.reddy@icici</span></td>
+        <td><span class="status-pass">&check; PASS</span></td>
+      </tr>
+      <tr>
+        <td><strong>Punjab</strong><br>Ludhiana / Samrala</td>
+        <td><strong>Harpreet Singh</strong></td>
+        <td><span class="code">PMK-PB-2024-99301</span></td>
+        <td><span class="code">3301-8844-1290</span></td>
+        <td>9811233445</td>
+        <td>Khasra #512/4, Khatauni #105<br>(Machhiwara)</td>
+        <td><strong>8.00 Acres</strong></td>
+        <td><span class="code">KCC-PNB-441290</span></td>
+        <td>Sharbati Wheat, Basmati Rice, Mustard</td>
+        <td><span class="code">harpreet.singh@pnb</span></td>
+        <td><span class="status-pass">&check; PASS</span></td>
+      </tr>
+      <tr>
+        <td><strong>Tamil Nadu</strong><br>Erode / Bhavani</td>
+        <td><strong>Kavitha Murugan</strong></td>
+        <td><span class="code">PMK-TN-2024-44211</span></td>
+        <td><span class="code">6612-9900-5544</span></td>
+        <td>9443011223</td>
+        <td>Khasra #89/1, Khatauni #63<br>(Anthiyur)</td>
+        <td><strong>5.00 Acres</strong></td>
+        <td><span class="code">KCC-CANARA-1122</span></td>
+        <td>Turmeric, Coconut, Sweet Corn</td>
+        <td><span class="code">kavitha.murugan@oksbi</span></td>
+        <td><span class="status-pass">&check; PASS</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>2. Middleman / Commercial Broker Penetration Test Cases (Rejected by System)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Test Scenario</th>
+        <th>Tested ID / Aadhaar Input</th>
+        <th>Server Endpoint</th>
+        <th>HTTP Response</th>
+        <th>System Protection Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Fake Commission Agent</strong></td>
+        <td><span class="code-danger">FAKE-BROKER-999</span></td>
+        <td><code>POST /api/auth/verify-govt-farmer</code></td>
+        <td><span class="status-fail">403 Forbidden</span></td>
+        <td>Access Denied &bull; Red Security Alert displayed &bull; Produce listing blocked</td>
+      </tr>
+      <tr>
+        <td><strong>Unregistered Mandi Trader</strong></td>
+        <td><span class="code-danger">TRADER-MANDI-102</span></td>
+        <td><code>POST /api/auth/verify-govt-farmer</code></td>
+        <td><span class="status-fail">403 Forbidden</span></td>
+        <td>Access Denied &bull; Red Security Alert displayed &bull; Produce listing blocked</td>
+      </tr>
+      <tr>
+        <td><strong>Fabricated Aadhaar Number</strong></td>
+        <td><span class="code-danger">0000-1111-2222</span></td>
+        <td><code>POST /api/auth/verify-govt-farmer</code></td>
+        <td><span class="status-fail">403 Forbidden</span></td>
+        <td>Identity not found in State Land Records &bull; Rejection logged</td>
+      </tr>
+      <tr>
+        <td><strong>Random Mobile Number</strong></td>
+        <td><span class="code-danger">9999999999</span></td>
+        <td><code>POST /api/auth/verify-govt-farmer</code></td>
+        <td><span class="status-fail">403 Forbidden</span></td>
+        <td>No agricultural land parcel associated with this number</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="demo-steps">
+    <h3>Live Hackathon Jury Demonstration Script (30 Seconds):</h3>
+    <ol>
+      <li>Open <strong>Login / Register</strong> on FarmDirect &rarr; Select <strong>Farmer Gateway</strong> &rarr; Click <strong>Register</strong>.</li>
+      <li>Enter phone/email, verify OTP &rarr; Advance to <strong>Step 2 (Government Land Registry Gatekeeper)</strong>.</li>
+      <li><strong>Test 1 (Rejection Test)</strong>: Click the red chip <code>🚫 Test Fake Middleman</code> &rarr; Click <em>"Verify against Government Land Registry"</em> &rarr; Show judges the <strong>Red Middleman Rejection Banner</strong>.</li>
+      <li><strong>Test 2 (Genuine Farmer Pass)</strong>: Click <code>🌾 Ramesh Patel (MP - 4.5 Ac)</code> &rarr; Click <em>"Verify against Government Land Registry"</em> &rarr; Show the <strong>Green Bhulekh Land Title Certification</strong> (Khasra #214/1, 4.5 Acres, Sehore, MP) and proceed to list fresh produce!</li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    <span>FarmDirect &bull; Disintermediating Agricultural Mandis</span>
+    <span>PostgreSQL Database: <code>farmdirect.govt_verified_farmers</code></span>
+    <span>Generated for SIH Evaluation 2026</span>
+  </div>
+
+</body>
+</html>

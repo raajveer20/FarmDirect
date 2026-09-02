@@ -4,6 +4,9 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { DemoGuideModal } from './components/DemoGuideModal';
 import { AuthModal } from './components/AuthModal';
+import { MiddlemenEliminationModal } from './components/MiddlemenEliminationModal';
+import { EscrowSettlementModal } from './components/EscrowSettlementModal';
+import { BuyerPaymentModal } from './components/BuyerPaymentModal';
 
 import { LandingPage } from './pages/LandingPage';
 import { MarketplacePage } from './pages/MarketplacePage';
@@ -18,9 +21,17 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { HowItWorksPage } from './pages/HowItWorksPage';
 
 const MainContent = () => {
-  const { activeView, toastMessage } = useApp();
+  const { activeView, toastMessage, currentUser, userRole } = useApp();
 
   const renderView = () => {
+    const effRole = (currentUser?.role || userRole || '').toLowerCase();
+    // The home feature is not available after login through any of the three gateways
+    if (currentUser && currentUser.isLoggedIn && (activeView === 'home' || !activeView)) {
+      if (effRole.includes('farmer')) return <FarmerDashboard />;
+      if (effRole.includes('buyer')) return <BuyerDashboard />;
+      return <AdminDashboard />;
+    }
+
     switch (activeView) {
       case 'home':
         return <LandingPage />;
@@ -51,7 +62,7 @@ const MainContent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+    <div className="light-mode min-h-screen bg-slate-50 flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
       {/* Toast Notification Banner */}
       {toastMessage && (
         <div className="fixed top-20 right-6 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-emerald-500/50 flex items-center gap-2 animate-bounce">
@@ -70,6 +81,9 @@ const MainContent = () => {
       <Footer />
       <DemoGuideModal />
       <AuthModal />
+      <MiddlemenEliminationModal />
+      <EscrowSettlementModal />
+      <BuyerPaymentModal />
     </div>
   );
 };

@@ -6,41 +6,41 @@ export const RouteMap = ({ stops, unoptimized, optimized, savings }) => {
   const [selectedStop, setSelectedStop] = useState(stops[0]);
 
   return (
-    <div className="bg-slate-900 text-slate-100 rounded-2xl p-6 shadow-xl border border-slate-800 space-y-6">
+    <div className="glass-dark-card text-slate-100 rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/10 space-y-6">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+            <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1 backdrop-blur-md">
               <Zap className="w-3.5 h-3.5 text-emerald-400" />
               AI ROUTE OPTIMIZATION ENGINE
             </span>
           </div>
-          <h3 className="text-xl font-extrabold text-white mt-1">
+          <h3 className="text-xl font-black text-white mt-1 tracking-tight">
             Smart Logistics Route & Bundling
           </h3>
 
         </div>
 
         {/* Toggle Optimized vs Unoptimized */}
-        <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs font-semibold">
+        <div className="flex items-center bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/10 text-xs font-semibold">
           <button
             onClick={() => setActiveTab('optimized')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
+            className={`px-3.5 py-1.5 rounded-xl transition-all ${
               activeTab === 'optimized' 
                 ? 'bg-emerald-500 text-slate-950 font-bold shadow-md' 
-                : 'text-slate-400 hover:text-white'
+                : 'text-slate-300 hover:text-white'
             }`}
           >
             AI Optimized Route
           </button>
           <button
             onClick={() => setActiveTab('unoptimized')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
+            className={`px-3.5 py-1.5 rounded-xl transition-all ${
               activeTab === 'unoptimized' 
-                ? 'bg-slate-700 text-slate-200' 
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-slate-700 text-slate-200 font-bold' 
+                : 'text-slate-300 hover:text-white'
             }`}
           >
             Unoptimized Baseline
@@ -50,7 +50,7 @@ export const RouteMap = ({ stops, unoptimized, optimized, savings }) => {
 
       {/* Metrics Banner */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+        <div className="bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10">
           <p className="text-[11px] text-slate-400 uppercase font-semibold">Total Distance</p>
           <p className="text-2xl font-black text-white mt-0.5">
             {activeTab === 'optimized' ? `${optimized.distanceKm} km` : `${unoptimized.distanceKm} km`}
@@ -60,7 +60,7 @@ export const RouteMap = ({ stops, unoptimized, optimized, savings }) => {
           </p>
         </div>
 
-        <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+        <div className="bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10">
           <p className="text-[11px] text-slate-400 uppercase font-semibold">Fuel Cost</p>
           <p className="text-2xl font-black text-emerald-400 mt-0.5">
             ₹{activeTab === 'optimized' ? optimized.fuelCost : unoptimized.fuelCost}
@@ -70,7 +70,7 @@ export const RouteMap = ({ stops, unoptimized, optimized, savings }) => {
           </p>
         </div>
 
-        <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+        <div className="bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10">
           <p className="text-[11px] text-slate-400 uppercase font-semibold">Estimated Time</p>
           <p className="text-2xl font-black text-amber-400 mt-0.5">
             {activeTab === 'optimized' ? optimized.travelTime : unoptimized.travelTime}
@@ -80,7 +80,7 @@ export const RouteMap = ({ stops, unoptimized, optimized, savings }) => {
           </p>
         </div>
 
-        <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+        <div className="bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10">
           <p className="text-[11px] text-slate-400 uppercase font-semibold">Carbon Reduction</p>
           <p className="text-2xl font-black text-teal-300 mt-0.5">
             {activeTab === 'optimized' ? optimized.co2Emissions : unoptimized.co2Emissions}

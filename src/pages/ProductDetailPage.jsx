@@ -3,20 +3,16 @@ import { useApp } from '../context/AppContext';
 import { PriceBreakdown } from '../components/PriceBreakdown';
 import { 
   MapPin, 
-  Award, 
   Calendar, 
   Truck, 
-  PhoneCall, 
-  CheckCircle2, 
   ShoppingCart, 
   ArrowLeft, 
-  ShieldCheck, 
   Sparkles,
   UserCheck
 } from 'lucide-react';
 
 export const ProductDetailPage = () => {
-  const { selectedProduct, navigateTo, addToCart, placeOrder, cart } = useApp();
+  const { selectedProduct, navigateTo, addToCart, placeOrder } = useApp();
 
   const product = selectedProduct || {
     id: "prod-1",
@@ -41,15 +37,19 @@ export const ProductDetailPage = () => {
     description: "Farm-fresh, naturally ripened vine tomatoes grown using organic bio-fertilizers. Ideal for domestic consumption, restaurants, and retail processing."
   };
 
-  const [quantity, setQuantity] = useState(product.moq || 10);
+  const minAllowed = Math.max(10, product.moq || 10);
+  const [quantity, setQuantity] = useState(minAllowed);
 
   const totalPrice = product.pricePerKg * quantity;
   const traditionalTotal = (product.traditionalPrice || 45) * quantity;
   const totalSavings = traditionalTotal - totalPrice;
 
   const handleBuyNow = () => {
-    addToCart(product, quantity);
-    placeOrder("Green Valley Supermarket, Bhopal");
+    const validQty = Math.max(minAllowed, quantity);
+    const added = addToCart(product, validQty);
+    if (added) {
+      placeOrder("Green Valley Supermarket, Bhopal");
+    }
   };
 
   return (
@@ -58,7 +58,7 @@ export const ProductDetailPage = () => {
       {/* Back Button */}
       <button
         onClick={() => navigateTo('marketplace')}
-        className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-emerald-600 transition-colors bg-white px-3 py-1.5 rounded-lg border border-slate-200"
+        className="glass-pill inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-700 px-3.5 py-2 rounded-xl transition-all shadow-2xs"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back to Marketplace</span>
@@ -69,7 +69,7 @@ export const ProductDetailPage = () => {
         {/* Left Image & Farmer Profile */}
         <div className="lg:col-span-6 space-y-6">
           
-          <div className="bg-white p-3 rounded-3xl border border-slate-200 shadow-md relative overflow-hidden">
+          <div className="glass-card p-3 rounded-3xl border border-white/80 shadow-md relative overflow-hidden">
             <img
               src={product.image}
               alt={product.name}
@@ -77,11 +77,11 @@ export const ProductDetailPage = () => {
             />
 
             <div className="absolute top-6 left-6 flex gap-2">
-              <span className="bg-slate-900/90 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-md">
+              <span className="bg-slate-900/80 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-md border border-white/10 shadow-xs">
                 {product.qualityGrade}
               </span>
               {product.isOrganic && (
-                <span className="bg-emerald-600/90 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-md">
+                <span className="bg-emerald-600/85 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-md border border-white/20 shadow-xs">
                   Certified Organic
                 </span>
               )}
@@ -89,14 +89,14 @@ export const ProductDetailPage = () => {
           </div>
 
           {/* Verified Farmer Profile Card */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div className="glass-card p-6 sm:p-7 rounded-3xl border border-white/80 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center font-bold text-lg border border-emerald-200/50">
                   <UserCheck className="w-6 h-6 text-emerald-600" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900">{product.farmer}</h4>
+                  <h4 className="text-sm font-bold text-slate-900 tracking-tight">{product.farmer}</h4>
                   <p className="text-xs text-slate-500 flex items-center gap-1">
                     <MapPin className="w-3.5 h-3.5 text-slate-400" />
                     {product.farmerLocation}
@@ -122,13 +122,13 @@ export const ProductDetailPage = () => {
         {/* Right Details & Quantity Purchase Selector */}
         <div className="lg:col-span-6 space-y-6">
           
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+          <div className="glass-card p-6 sm:p-8 rounded-3xl border border-white/80 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.04)] space-y-6">
             
             <div>
               <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wide">
                 <span>{product.category}</span> • <span>Direct FPO Listing</span>
               </div>
-              <h1 className="text-3xl font-black text-slate-900 mt-1">{product.name}</h1>
+              <h1 className="text-3xl font-black text-slate-900 mt-1 tracking-tight">{product.name}</h1>
               <p className="text-xs text-slate-500 mt-2 leading-relaxed">{product.description}</p>
             </div>
 
@@ -176,34 +176,46 @@ export const ProductDetailPage = () => {
             {/* Quantity Selector */}
             <div className="space-y-3">
               <label className="text-xs font-bold text-slate-800 flex items-center justify-between">
-                <span>Select Order Quantity (MOQ: {product.moq || 10} {product.unit || 'kg'}):</span>
+                <span>Select Order Quantity (Min Order: {minAllowed} {product.unit || 'kg'}):</span>
                 <span className="text-emerald-700 font-extrabold">Total: ₹{totalPrice}</span>
               </label>
 
               <div className="flex items-center gap-3">
                 <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
                   <button
-                    onClick={() => setQuantity(prev => Math.max(product.moq || 10, prev - 10))}
-                    className="px-3.5 py-2 text-slate-700 hover:bg-slate-200 font-bold"
+                    onClick={() => setQuantity(prev => Math.max(minAllowed, prev - 5))}
+                    className="px-3.5 py-2 text-slate-700 hover:bg-slate-200 font-bold transition-colors cursor-pointer"
+                    title="Decrease by 5 kg"
                   >
                     -
                   </button>
                   <input
                     type="number"
+                    min={minAllowed}
+                    step="5"
                     value={quantity}
-                    onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setQuantity(val > 0 ? val : minAllowed);
+                    }}
+                    onBlur={() => {
+                      if (quantity < minAllowed) {
+                        setQuantity(minAllowed);
+                      }
+                    }}
                     className="w-16 text-center text-sm font-bold bg-transparent focus:outline-none"
                   />
                   <button
-                    onClick={() => setQuantity(prev => prev + 10)}
-                    className="px-3.5 py-2 text-slate-700 hover:bg-slate-200 font-bold"
+                    onClick={() => setQuantity(prev => prev + 5)}
+                    className="px-3.5 py-2 text-slate-700 hover:bg-slate-200 font-bold transition-colors cursor-pointer"
+                    title="Increase by 5 kg"
                   >
                     +
                   </button>
                 </div>
 
                 <div className="text-xs text-slate-500">
-                  Total Saved: <span className="font-bold text-emerald-600">₹{totalSavings}</span>
+                  Min order: <span className="font-bold text-emerald-700">{minAllowed} kg</span> • <span className="text-slate-500 font-semibold">+5 kg per step</span> • Saved: <span className="font-bold text-emerald-600">₹{totalSavings}</span>
                 </div>
               </div>
             </div>
@@ -211,16 +223,16 @@ export const ProductDetailPage = () => {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
               <button
-                onClick={() => addToCart(product, quantity)}
-                className="w-full sm:w-1/2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2"
+                onClick={() => addToCart(product, Math.max(minAllowed, quantity))}
+                className="w-full sm:w-1/2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 <ShoppingCart className="w-4 h-4" />
-                <span>Add to Cart ({quantity} kg)</span>
+                <span>Add to Cart ({Math.max(minAllowed, quantity)} kg)</span>
               </button>
 
               <button
                 onClick={handleBuyNow}
-                className="w-full sm:w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3.5 rounded-xl shadow-lg shadow-emerald-600/30 transition-colors flex items-center justify-center gap-2"
+                className="w-full sm:w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3.5 rounded-xl shadow-lg shadow-emerald-600/30 transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Sparkles className="w-4 h-4" />
                 <span>Buy Now (Express Checkout)</span>
@@ -239,6 +251,7 @@ export const ProductDetailPage = () => {
         traditionalRetailPrice={product.traditionalPrice || 45}
         consumerPrice={product.consumerPrice || 30}
         cropName={product.name}
+        quantity={quantity}
       />
 
     </div>

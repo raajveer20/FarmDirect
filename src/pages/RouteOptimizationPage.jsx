@@ -15,22 +15,22 @@ export const RouteOptimizationPage = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="glass-dark-card text-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="space-y-2 text-center md:text-left">
-          <div className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-300 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/30">
+          <div className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-300 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/30 backdrop-blur-md">
             <Truck className="w-4 h-4 text-emerald-400" />
             <span>AI LOGISTICS & ROUTE OPTIMIZATION</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black">Smart Multi-Hop Route Bundling</h1>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Smart Multi-Hop Route Bundling</h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
             Combining smaller farmer produce loads into single optimized truck dispatches, cutting fuel costs by 22% and transport times by 45 mins.
           </p>
         </div>
 
-        <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 text-center shrink-0">
-          <p className="text-[10px] text-emerald-400 font-mono uppercase font-bold">Fuel Efficiency Gain</p>
+        <div className="bg-white/10 backdrop-blur-xl p-4 rounded-2xl border border-white/15 text-center shrink-0">
+          <p className="text-[10px] text-emerald-300 font-mono uppercase font-bold">Fuel Efficiency Gain</p>
           <p className="text-3xl font-black text-white">+31%</p>
-          <p className="text-[10px] text-slate-400">19 km saved per route</p>
+          <p className="text-[10px] text-slate-300">19 km saved per route</p>
         </div>
       </div>
 
@@ -43,13 +43,13 @@ export const RouteOptimizationPage = () => {
       />
 
       {/* Logistics Partner Pickup Dispatch Cards (Requirement #10) */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+      <div className="glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.04)] space-y-6">
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <div>
             <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
               LOGISTICS PARTNER DISPATCH
             </span>
-            <h2 className="text-2xl font-black text-slate-900 mt-2">Available Pickup Requests</h2>
+            <h2 className="text-2xl font-black text-slate-900 mt-2 tracking-tight">Available Pickup Requests</h2>
           </div>
 
           <div className="text-xs text-slate-500 font-medium">
@@ -60,7 +60,7 @@ export const RouteOptimizationPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* Delivery Card 1 */}
-          <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-4 relative">
+          <div className="bg-white/70 rounded-2xl p-5 border border-slate-200/80 space-y-4 relative shadow-2xs">
             <div className="flex items-center justify-between text-xs font-bold">
               <span className="text-slate-500">Pickup #KC1024</span>
               <span className="bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">Ready for Dispatch</span>
