@@ -1,13 +1,20 @@
 import pg from 'pg';
 import { initialProducts, initialOrders } from '../data/mockData.js';
 
-const pool = new pg.Pool({
-  host: process.env.PGHOST || 'localhost',
-  port: Number(process.env.PGPORT) || 5432,
-  user: process.env.PGUSER || 'postgres',
-  password: process.env.PGPASSWORD || '0920',
-  database: process.env.PGDATABASE || 'farmdirect',
-});
+const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+
+const pool = connectionString
+  ? new pg.Pool({
+      connectionString,
+      ssl: { rejectUnauthorized: false }
+    })
+  : new pg.Pool({
+      host: process.env.PGHOST || 'localhost',
+      port: Number(process.env.PGPORT) || 5432,
+      user: process.env.PGUSER || 'postgres',
+      password: process.env.PGPASSWORD || '0920',
+      database: process.env.PGDATABASE || 'farmdirect',
+    });
 
 export async function testConnection() {
   const client = await pool.connect();
