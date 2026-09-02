@@ -8,6 +8,14 @@ const AppContext = createContext();
 
 const API_BASE = '/api';
 
+/** Helper: build Authorization header from stored JWT token */
+function authHeaders(extra = {}) {
+  const token = localStorage.getItem('farmdirect_token');
+  const headers = { 'Content-Type': 'application/json', ...extra };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+}
+
 // Realistic Indian Agricultural Mandi Economics Calculator
 export const calculateMiddlemenBreakdown = (product, qty = 10) => {
   if (!product) return null;
@@ -440,18 +448,19 @@ export const AppProvider = ({ children }) => {
 
   // Connect to PostgreSQL Backend API & Real-Time Sync Engine
   useEffect(() => {
-    // 1. Initial hydration from PostgreSQL
+    // 1. Initial hydration from PostgreSQL (with JWT auth headers)
     async function hydrateFromPostgres() {
       try {
-        const prodRes = await fetch('/api/products');
+        const prodRes = await fetch('/api/products', { headers: authHeaders() });
         if (prodRes.ok) {
-          const prods = await prodRes.json();
+          const data = await prodRes.json();
+          const prods = data.products || data;
           if (Array.isArray(prods)) {
             setProducts(prods);
           }
         }
 
-        const ordRes = await fetch('/api/orders');
+        const ordRes = await fetch('/api/orders', { headers: authHeaders() });
         if (ordRes.ok) {
           const ords = await ordRes.json();
           if (Array.isArray(ords) && ords.length > 0) {
@@ -459,7 +468,7 @@ export const AppProvider = ({ children }) => {
           }
         }
 
-        const payRes = await fetch('/api/payouts');
+        const payRes = await fetch('/api/payouts', { headers: authHeaders() });
         if (payRes.ok) {
           const pays = await payRes.json();
           if (Array.isArray(pays) && pays.length > 0) {
@@ -716,36 +725,44 @@ export const AppProvider = ({ children }) => {
     showToast('Farmer Profile & Land Verification verified successfully!', 'success');
   };
 
-  // Add new produce listing (Farmer Action)
+  // Add new produce listing (Farmer Action) — via authenticated backend API
   const addProduce = async (newProduct) => {
-    const createdItem = {
+    // Optimistic local item for instant UI feedback
+    const optimisticItem = {
       id: `prod-${Date.now()}`,
       ...newProduct,
-      farmer: currentUser?.fpoName || currentUser?.name || "Demo Farmer (Unauthenticated)",
-      farmerContact: currentUser?.phone || "+91 00000 00000",
+      farmer: currentUser?.fpoName || currentUser?.name || 'Verified Producer',
+      farmerContact: currentUser?.phone || '+91 00000 00000',
       farmerRating: 4.9,
-      farmerLocation: currentUser?.location || "Bhopal, MP",
-      state: "Madhya Pradesh",
+      farmerLocation: currentUser?.location || 'Bhopal, MP',
+      state: 'Madhya Pradesh',
       distanceKm: 8.5,
-      estimatedDelivery: "Same Day (4 Hours)",
+      estimatedDelivery: 'Same Day (4 Hours)',
       traditionalPrice: Math.round(Number(newProduct.pricePerKg) * 1.7),
       consumerPrice: Math.round(Number(newProduct.pricePerKg) * 1.2),
-      image: newProduct.image || "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80"
+      image: newProduct.image || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80'
     };
 
-    setProducts(prev => [createdItem, ...prev]);
+    setProducts(prev => [optimisticItem, ...prev]);
 
-    // Persist to PostgreSQL backend & broadcast live
+    // Persist to PostgreSQL backend with JWT auth
     try {
-      await fetch('/api/products', {
+      const res = await fetch('/api/products', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(createdItem)
+        headers: authHeaders(),
+        body: JSON.stringify(newProduct)
       });
-      realtimeSyncRef.current?.broadcast('PRODUCE_ADDED', createdItem);
-    } catch (e) {}
+      if (res.ok) {
+        const created = await res.json();
+        // Replace optimistic item with real server response
+        setProducts(prev => prev.map(p => p.id === optimisticItem.id ? created : p));
+        realtimeSyncRef.current?.broadcast('PRODUCE_ADDED', created);
+      }
+    } catch (e) {
+      console.warn('Backend offline, product saved locally:', e);
+    }
 
-    showToast(`Successfully listed ${createdItem.name} at ₹${createdItem.pricePerKg}/kg!`);
+    showToast(`Successfully listed ${optimisticItem.name} at ₹${newProduct.pricePerKg}/kg!`);
     
     if (demoStep === 2) {
       setDemoStep(3);
@@ -800,127 +817,117 @@ export const AppProvider = ({ children }) => {
   const clearCart = () => setCart([]);
 
   // Place order (Buyer Action with Escrow Payment Guarantee)
-  const placeOrder = (deliveryAddress = "102 Royal Palm Enclave, Bhopal MP", paymentDetails = {}) => {
+  // Now sends minimal data to backend; server calculates prices and manages inventory atomically.
+  const placeOrder = async (deliveryAddress = '102 Royal Palm Enclave, Bhopal MP', paymentDetails = {}) => {
     if (cart.length === 0) return;
 
-    const newOrders = cart.map((cartItem, idx) => {
-      const totalAmt = cartItem.product.pricePerKg * cartItem.qty;
-      const traditionalTotal = cartItem.product.traditionalPrice * cartItem.qty;
-      const saved = traditionalTotal - totalAmt;
-      const orderId = `FD${1025 + orders.length + idx}`;
+    const createdOrders = [];
+    for (const cartItem of cart) {
       const originCoord = resolveLocationCoordinates(cartItem.product.farmerLocation || 'Bhopal');
       const destCoord = resolveLocationCoordinates(deliveryAddress);
       const routePoints = generateInterpolatedRoute(originCoord, destCoord, 6);
-      const txnId = paymentDetails.txnId || `TXN-FD-UPI-${Math.floor(100000 + Math.random() * 900000)}`;
 
-      return {
-        id: orderId,
-        productName: cartItem.product.name,
+      const orderPayload = {
         productId: cartItem.product.id,
-        image: cartItem.product.image || "/images/oranges.jpg",
-        farmerName: cartItem.product.farmer,
-        buyerName: currentUser?.name ? `${currentUser.name} (${currentUser.role})` : "Rahul Sharma (Buyer)",
         quantity: cartItem.qty,
-        unit: cartItem.product.unit || "kg",
-        totalPrice: totalAmt,
-        savedAmount: Math.max(saved, 150),
-        orderDate: new Date().toLocaleString(),
         deliveryAddress,
-        status: "Order Placed & Escrow Funded",
-        currentStep: 1,
-        payment: {
-          method: paymentDetails.method || "UPI Instant (Dynamic QR)",
-          txnId,
-          status: "ESCROW_LOCKED",
-          amount: totalAmt,
-          bankName: paymentDetails.bankName || "State Bank of India (Escrow Trust)",
-          vpa: paymentDetails.vpa || "buyer@okhdfcbank"
-        },
         origin: {
-          title: "Order Placed At (Farm Origin)",
+          title: 'Order Placed At (Farm Origin)',
           name: cartItem.product.farmer,
           farmLocation: cartItem.product.farmerLocation || originCoord.label,
           address: `${cartItem.product.farmerLocation || originCoord.label}, Farm Gate #1`,
-          lat: originCoord.lat,
-          lng: originCoord.lng,
-          contact: cartItem.product.farmerContact || "+91 98765 43210",
+          lat: originCoord.lat, lng: originCoord.lng,
+          contact: cartItem.product.farmerContact || '+91 98765 43210',
           placedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          harvestDate: cartItem.product.harvestDate || "Fresh Harvest",
-          qualityGrade: cartItem.product.qualityGrade || "Grade A",
-          batchCode: `BATCH-${orderId}`
+          harvestDate: cartItem.product.harvestDate || 'Fresh Harvest',
+          qualityGrade: cartItem.product.qualityGrade || 'Grade A',
         },
         destination: {
-          title: "Delivery Destination",
-          name: currentUser?.name || "Rahul Sharma",
+          title: 'Delivery Destination',
+          name: currentUser?.name || 'Buyer',
           address: deliveryAddress,
-          lat: destCoord.lat,
-          lng: destCoord.lng,
-          contact: currentUser?.phone || "+91 98230 45678",
-          instructions: "Contactless doorstep fresh delivery",
-          estArrival: "Est. in 2 Hours (Direct Express)"
+          lat: destCoord.lat, lng: destCoord.lng,
+          contact: currentUser?.phone || '+91 98230 45678',
+          instructions: 'Contactless doorstep fresh delivery',
+          estArrival: 'Est. in 2 Hours (Direct Express)',
         },
-        routePoints,
         telemetry: {
-          currentLat: originCoord.lat,
-          currentLng: originCoord.lng,
-          currentCheckpoint: "Order Placed at Farm",
-          speed: "0 km/h (Preparing)",
-          temp: "4°C Cold Storage",
+          currentLat: originCoord.lat, currentLng: originCoord.lng,
+          currentCheckpoint: 'Order Placed at Farm',
+          speed: '0 km/h (Preparing)', temp: '4°C Cold Storage',
           distanceTotalKm: cartItem.product.distanceKm || 12.5,
           distanceRemainingKm: cartItem.product.distanceKm || 12.5,
-          etaMinutes: 60,
-          progressPercent: 5,
-          co2SavedKg: 2.1
+          etaMinutes: 60, progressPercent: 5, co2SavedKg: 2.1,
         },
-        trackingSteps: [
-          { title: "Order Placed", time: "Just now", completed: true, current: true, detail: `Order placed at ${cartItem.product.farmer}` },
-          { title: "Farmer Confirmed", time: "Pending", completed: false, detail: "Farmer prepping fresh harvest" },
-          { title: "Produce Packed", time: "Pending", completed: false, detail: "Quality grading & crate tagging" },
-          { title: "Picked Up", time: "Pending", completed: false, detail: "EV Cargo loading" },
-          { title: "In Transit", time: "Pending", completed: false, detail: "Route optimization corridor" },
-          { title: "Delivered", time: "Est. 2 Hours", completed: false, detail: `Deliver to ${deliveryAddress}` }
-        ],
-        driver: {
-          name: "Rajesh Kumar",
-          phone: "+91 98930 11223",
-          vehicle: "Tata Ace EV (MP-04-FD-2024)",
-          capacity: "850 kg / 1000 kg"
-        }
       };
-    });
 
-    setOrders(prev => [...newOrders, ...prev]);
-    const firstId = newOrders[0].id;
-    setTrackedOrderId(firstId);
-    clearCart();
-    setIsPaymentModalOpen(false);
-    setPendingCheckoutData(null);
-
-    // Persist orders to PostgreSQL backend & broadcast live
-    for (const ord of newOrders) {
       try {
-        fetch('/api/orders', {
+        const res = await fetch('/api/orders', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(ord)
+          headers: authHeaders(),
+          body: JSON.stringify(orderPayload),
         });
-        realtimeSyncRef.current?.broadcast('ORDER_PLACED', ord);
-      } catch (e) {}
+        if (res.ok) {
+          const created = await res.json();
+          // Merge routePoints for map display
+          created.routePoints = routePoints;
+          createdOrders.push(created);
+          realtimeSyncRef.current?.broadcast('ORDER_PLACED', created);
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err?.error?.message || 'Failed to place order', 'error');
+          return; // Stop on first error
+        }
+      } catch (e) {
+        // Fallback: create order locally if backend is offline
+        const totalAmt = cartItem.product.pricePerKg * cartItem.qty;
+        const fallbackOrder = {
+          id: `FD${1025 + orders.length}`,
+          productId: cartItem.product.id,
+          productName: cartItem.product.name,
+          image: cartItem.product.image,
+          farmerName: cartItem.product.farmer,
+          buyerName: currentUser?.name || 'Buyer',
+          quantity: cartItem.qty, unit: 'kg',
+          totalPrice: totalAmt,
+          savedAmount: Math.max(0, (cartItem.product.traditionalPrice * cartItem.qty) - totalAmt),
+          deliveryAddress,
+          status: 'ESCROW_LOCKED', currentStep: 1,
+          origin: orderPayload.origin,
+          destination: orderPayload.destination,
+          telemetry: orderPayload.telemetry,
+          routePoints,
+          trackingSteps: [
+            { title: 'Order Placed', time: 'Just now', completed: true, current: true, detail: `Order placed` },
+            { title: 'Farmer Confirmed', time: 'Pending', completed: false },
+            { title: 'Produce Packed', time: 'Pending', completed: false },
+            { title: 'Picked Up', time: 'Pending', completed: false },
+            { title: 'In Transit', time: 'Pending', completed: false },
+            { title: 'Delivered', time: 'Pending', completed: false },
+          ],
+          driver: { name: 'Rajesh Kumar', phone: '+91 98930 11223', vehicle: 'Tata Ace EV (MP-04-FD-2024)', capacity: '850 kg / 1000 kg' },
+        };
+        createdOrders.push(fallbackOrder);
+      }
     }
 
-    try {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-    } catch (e) {}
+    if (createdOrders.length > 0) {
+      setOrders(prev => [...createdOrders, ...prev]);
+      setTrackedOrderId(createdOrders[0].id);
+      clearCart();
+      setIsPaymentModalOpen(false);
+      setPendingCheckoutData(null);
 
-    showToast(`Order #${firstId} placed! Payment locked securely in Escrow Trust.`, 'success');
-    navigateTo('buyer-dash');
+      try {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      } catch (e) {}
 
-    if (demoStep === 4) {
-      setDemoStep(5);
+      showToast(`Order #${createdOrders[0].id} placed! Payment locked securely in Escrow Trust.`, 'success');
+      navigateTo('buyer-dash');
+
+      if (demoStep === 4) {
+        setDemoStep(5);
+      }
     }
   };
 
@@ -955,7 +962,7 @@ export const AppProvider = ({ children }) => {
             ...s,
             completed: idx < currentStep,
             current: idx === currentStep - 1,
-            time: idx < currentStep ? (s.time === "Pending" ? "Confirmed" : s.time) : s.time
+            time: idx < currentStep ? (s.time === 'Pending' ? 'Confirmed' : s.time) : s.time
           })) : []
         };
       }
@@ -965,7 +972,7 @@ export const AppProvider = ({ children }) => {
     try {
       await fetch(`/api/orders/${orderId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders(),
         body: JSON.stringify({ status: newStatus, currentStep })
       });
       realtimeSyncRef.current?.broadcast('ORDER_UPDATED', { id: orderId, status: newStatus, currentStep });
@@ -989,7 +996,7 @@ export const AppProvider = ({ children }) => {
     setIsEscrowModalOpen(false);
   };
 
-  const settleEscrowHandover = (orderId, _otp = '2026') => {
+  const settleEscrowHandover = async (orderId, _otp = '2026') => {
     const targetOrder = orders.find(o => o.id === orderId);
     if (!targetOrder) return;
 
@@ -1051,26 +1058,40 @@ export const AppProvider = ({ children }) => {
       receipt: newReceipt
     });
 
-    // Persist to PostgreSQL backend & broadcast live
+    // Persist to PostgreSQL backend & broadcast live (with JWT auth)
     try {
-      fetch(`/api/orders/${orderId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          status: "Delivered & Escrow Settled",
-          currentStep: 6,
-          utrNumber: utr,
-          escrowSettled: true
-        })
-      });
-      fetch('/api/payouts', {
+      // Try the authenticated confirm-delivery endpoint first
+      const confirmRes = await fetch(`/api/orders/${orderId}/confirm-delivery`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newReceipt)
+        headers: authHeaders(),
+        body: JSON.stringify({})
       });
+      if (confirmRes.ok) {
+        const result = await confirmRes.json();
+        if (result.payout) {
+          setPayoutHistory(prev => [result.payout, ...prev.filter(p => p.orderId !== orderId)]);
+        }
+      } else {
+        // Fallback: use PATCH if confirm-delivery fails (e.g., auth not available)
+        fetch(`/api/orders/${orderId}`, {
+          method: 'PATCH',
+          headers: authHeaders(),
+          body: JSON.stringify({
+            status: 'Delivered & Escrow Settled',
+            currentStep: 6,
+            utrNumber: utr,
+            escrowSettled: true
+          })
+        });
+        fetch('/api/payouts', {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify(newReceipt)
+        });
+      }
       realtimeSyncRef.current?.broadcast('ORDER_UPDATED', {
         id: orderId,
-        status: "Delivered & Escrow Settled",
+        status: 'Delivered & Escrow Settled',
         currentStep: 6,
         utrNumber: utr,
         escrowSettled: true

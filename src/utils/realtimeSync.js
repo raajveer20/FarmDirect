@@ -52,6 +52,24 @@ export function playNotificationTone(type = 'order') {
 
       osc.start();
       osc.stop(ctx.currentTime + 0.7);
+    } else if (type === 'alert') {
+      // Urgent alert tone for temperature/security alerts
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.setValueAtTime(440, ctx.currentTime + 0.15);
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.3);
+
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
     }
   } catch (e) {
     // AudioContext blocked before user interaction, silent fallback
@@ -63,6 +81,9 @@ export class RealtimeSync {
     this.handlers = handlers;
     this.eventSource = null;
     this.channel = null;
+    this.reconnectAttempts = 0;
+    this.maxReconnectDelay = 30000; // 30 seconds max
+    this.destroyed = false;
     this.init();
   }
 
@@ -77,35 +98,56 @@ export class RealtimeSync {
       } catch (e) {}
     }
 
-    // 2. Server-Sent Events (SSE) for true network sync across 3 distinct laptops!
-    if (typeof window !== 'undefined' && 'EventSource' in window) {
-      try {
-        this.eventSource = new EventSource('/api/events');
+    // 2. Server-Sent Events (SSE) for true network sync
+    this.connectSSE();
+  }
 
-        this.eventSource.addEventListener('PRODUCE_ADDED', (e) => {
-          const payload = JSON.parse(e.data);
-          this.handleEvent('PRODUCE_ADDED', payload);
+  connectSSE() {
+    if (this.destroyed) return;
+    if (typeof window === 'undefined' || !('EventSource' in window)) return;
+
+    try {
+      this.eventSource = new EventSource('/api/events');
+
+      this.eventSource.addEventListener('CONNECTED', () => {
+        console.log('✅ FarmDirect Real-Time Sync connected');
+        this.reconnectAttempts = 0; // Reset on successful connection
+      });
+
+      // Core event types
+      const eventTypes = [
+        'PRODUCE_ADDED', 'ORDER_PLACED', 'ORDER_UPDATED',
+        'PAYOUT_SETTLED', 'ESCROW_UPDATED', 'TELEMETRY_UPDATED',
+        'SHIPMENT_UPDATED', 'TEMPERATURE_ALERT'
+      ];
+
+      for (const eventType of eventTypes) {
+        this.eventSource.addEventListener(eventType, (e) => {
+          try {
+            const payload = JSON.parse(e.data);
+            this.handleEvent(eventType, payload);
+          } catch (err) {
+            console.warn(`Failed to parse SSE event ${eventType}:`, err);
+          }
         });
+      }
 
-        this.eventSource.addEventListener('ORDER_PLACED', (e) => {
-          const payload = JSON.parse(e.data);
-          this.handleEvent('ORDER_PLACED', payload);
-        });
+      this.eventSource.onerror = () => {
+        if (this.destroyed) return;
+        this.eventSource?.close();
+        this.eventSource = null;
 
-        this.eventSource.addEventListener('ORDER_UPDATED', (e) => {
-          const payload = JSON.parse(e.data);
-          this.handleEvent('ORDER_UPDATED', payload);
-        });
-
-        this.eventSource.addEventListener('PAYOUT_SETTLED', (e) => {
-          const payload = JSON.parse(e.data);
-          this.handleEvent('PAYOUT_SETTLED', payload);
-        });
-
-        this.eventSource.onerror = () => {
-          // Reconnection is handled automatically by EventSource
-        };
-      } catch (e) {}
+        // Exponential backoff reconnection
+        const delay = Math.min(
+          1000 * Math.pow(2, this.reconnectAttempts),
+          this.maxReconnectDelay
+        );
+        this.reconnectAttempts++;
+        console.log(`🔄 SSE reconnecting in ${delay / 1000}s (attempt ${this.reconnectAttempts})`);
+        setTimeout(() => this.connectSSE(), delay);
+      };
+    } catch (e) {
+      console.warn('SSE connection failed:', e);
     }
   }
 
@@ -122,6 +164,15 @@ export class RealtimeSync {
     } else if (type === 'PAYOUT_SETTLED' && this.handlers.onPayoutSettled) {
       playNotificationTone('payout');
       this.handlers.onPayoutSettled(payload);
+    } else if (type === 'ESCROW_UPDATED' && this.handlers.onEscrowUpdated) {
+      this.handlers.onEscrowUpdated(payload);
+    } else if (type === 'TELEMETRY_UPDATED' && this.handlers.onTelemetryUpdated) {
+      this.handlers.onTelemetryUpdated(payload);
+    } else if (type === 'SHIPMENT_UPDATED' && this.handlers.onShipmentUpdated) {
+      this.handlers.onShipmentUpdated(payload);
+    } else if (type === 'TEMPERATURE_ALERT' && this.handlers.onTemperatureAlert) {
+      playNotificationTone('alert');
+      this.handlers.onTemperatureAlert(payload);
     }
   }
 
@@ -135,6 +186,7 @@ export class RealtimeSync {
   }
 
   destroy() {
+    this.destroyed = true;
     if (this.channel) this.channel.close();
     if (this.eventSource) this.eventSource.close();
   }
