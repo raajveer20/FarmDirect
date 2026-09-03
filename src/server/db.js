@@ -27,7 +27,7 @@ const pool = connectionString
       host: process.env.PGHOST || 'localhost',
       port: Number(process.env.PGPORT) || 5432,
       user: process.env.PGUSER || 'postgres',
-      password: process.env.PGPASSWORD || '',
+      password: process.env.PGPASSWORD || '0920',
       database: process.env.PGDATABASE || 'farmdirect',
     });
 
