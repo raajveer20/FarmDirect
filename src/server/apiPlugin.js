@@ -50,8 +50,8 @@ export function createApiMiddleware() {
     }
   }
 
-  // Heartbeat every 30 seconds
-  setInterval(() => {
+  // Heartbeat every 30 seconds (unref'd so it does not keep process alive)
+  const heartbeatTimer = setInterval(() => {
     const heartbeat = `: heartbeat ${Date.now()}\n\n`;
     for (const [client] of sseClients) {
       try {
@@ -61,6 +61,9 @@ export function createApiMiddleware() {
       }
     }
   }, 30000);
+  if (heartbeatTimer.unref) {
+    heartbeatTimer.unref();
+  }
 
   function readJsonBody(req) {
     return new Promise((resolve, reject) => {
