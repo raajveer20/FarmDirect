@@ -33,7 +33,7 @@ import {
   requireRole,
 } from './auth.js';
 
-export function farmDirectApiPlugin() {
+export function createApiMiddleware() {
   const sseClients = new Map(); // Map<res, { userId, role }>
 
   function broadcast(eventType, payload, targetRole = null) {
@@ -142,19 +142,7 @@ export function farmDirectApiPlugin() {
     return after.split('/')[0];
   }
 
-  return {
-    name: 'farmdirect-api-plugin',
-
-    async configureServer(server) {
-      // Run migrations and seed on boot
-      try {
-        await runMigrations();
-        await seedIfEmpty();
-      } catch (err) {
-        console.warn('⚠️ DB setup warning:', err.message);
-      }
-
-      server.middlewares.use(async (req, res, next) => {
+  return async function apiMiddleware(req, res, next) {
         const rawUrl = req.url || '';
         const url = rawUrl.split('?')[0];
         const queryString = rawUrl.includes('?') ? rawUrl.split('?')[1] : '';
@@ -403,9 +391,31 @@ export function farmDirectApiPlugin() {
 
           return sendError(res, status, code, msg);
         }
-
         next();
-      });
+  };
+}
+
+export function farmDirectApiPlugin() {
+  const middleware = createApiMiddleware();
+  return {
+    name: 'farmdirect-api-plugin',
+    async configureServer(server) {
+      try {
+        await runMigrations();
+        await seedIfEmpty();
+      } catch (err) {
+        console.warn('⚠️ DB setup warning:', err.message);
+      }
+      server.middlewares.use(middleware);
     },
+    async configurePreviewServer(server) {
+      try {
+        await runMigrations();
+        await seedIfEmpty();
+      } catch (err) {
+        console.warn('⚠️ DB setup warning:', err.message);
+      }
+      server.middlewares.use(middleware);
+    }
   };
 }

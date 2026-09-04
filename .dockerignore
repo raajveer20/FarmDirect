@@ -1,0 +1,8 @@
+node_modules
+dist
+.git
+.agents
+.vscode
+venv
+backend/target
+*.log
