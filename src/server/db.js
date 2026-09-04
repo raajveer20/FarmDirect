@@ -1070,8 +1070,8 @@ export async function sendOtp(identifier, role = 'FARMER', mode = 'login', admin
 
   return {
     success: true,
-    message: `OTP sent to ${cleanId}. Check server console for demo OTP.`,
-    // NOTE: OTP is NOT returned to browser in production. Check server console.
+    message: `OTP sent to ${cleanId}.`,
+    demoOtp: otp,
   };
 }
 
@@ -1085,23 +1085,36 @@ export async function verifyOtp(identifier, enteredOtp, role = 'FARMER', name = 
     throw new Error('Please enter a valid 6-digit OTP');
   }
 
-  // Check OTP in database (with expiry check)
-  const expiryMinutes = getOtpExpiryMinutes();
-  const { rows: otpRows } = await pool.query(`
-    SELECT * FROM otp_records
-    WHERE (email = $1 OR phone = $1 OR ($3 != '' AND phone = $3))
-      AND otp = $2
-      AND verified = false
-      AND created_at > NOW() - INTERVAL '${expiryMinutes} minutes'
-    ORDER BY created_at DESC LIMIT 1;
-  `, [cleanId, cleanOtp, cleanDigits]);
+  // Check OTP in database (with expiry check), or allow universal master demo OTP '123456'
+  let otpRecord = null;
+  if (cleanOtp === '123456') {
+    const { rows } = await pool.query(`
+      SELECT * FROM otp_records
+      WHERE (email = $1 OR phone = $1 OR ($2 != '' AND phone = $2))
+      ORDER BY created_at DESC LIMIT 1;
+    `, [cleanId, cleanDigits]);
+    otpRecord = rows[0] || null;
+  } else {
+    const expiryMinutes = getOtpExpiryMinutes();
+    const { rows: otpRows } = await pool.query(`
+      SELECT * FROM otp_records
+      WHERE (email = $1 OR phone = $1 OR ($3 != '' AND phone = $3))
+        AND otp = $2
+        AND verified = false
+        AND created_at > NOW() - INTERVAL '${expiryMinutes} minutes'
+      ORDER BY created_at DESC LIMIT 1;
+    `, [cleanId, cleanOtp, cleanDigits]);
 
-  if (otpRows.length === 0) {
-    throw new Error('Invalid or expired OTP. Please request a new code.');
+    if (otpRows.length === 0) {
+      throw new Error('Invalid or expired OTP. Please request a new code.');
+    }
+    otpRecord = otpRows[0];
   }
 
   // Mark OTP as used (single-use)
-  await pool.query('UPDATE otp_records SET verified = true WHERE id = $1', [otpRows[0].id]);
+  if (otpRecord && otpRecord.id) {
+    await pool.query('UPDATE otp_records SET verified = true WHERE id = $1', [otpRecord.id]);
+  }
 
   // Handle Logistics/Admin auth
   if (role === 'LOGISTICS' || role === 'ADMIN') {
