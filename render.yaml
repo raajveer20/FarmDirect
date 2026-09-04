@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: farmdirect
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        value: postgresql://neondb_owner:npg_mHb8LrOW0toV@ep-dark-unit-a7ia81qu-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require
+      - key: JWT_SECRET
+        value: farmdirect-dev-secret
+      - key: NODE_ENV
+        value: production
